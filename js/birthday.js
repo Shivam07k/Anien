@@ -255,22 +255,25 @@
             while (movers.length < wanted && attempts < 500) {
                 attempts++;
                 var size = isMobile ? 88 + Math.random() * 26 : 70 + Math.random() * 40;
-                var x = 16 + Math.random() * (vw - size - 32);
-                var y = 16 + Math.random() * (dh - size - 32);
+                var x = 16 + Math.random() * Math.max(1, vw - size - 32);
+                var y = 16 + Math.random() * Math.max(1, dh - size - 32);
                 var rect = { left: x, top: y, right: x + size, bottom: y + size };
-                if (overlaps(rect, protectedRects())) continue;
 
-                var collision = false;
-                for (var i = 0; i < used.length; i++) {
-                    var b = used[i];
-                    if (rect.left < b.r && rect.right > b.l && rect.top < b.b && rect.bottom > b.t) {
-                        collision = true;
-                        break;
+                var strict = attempts < 200;
+                if (strict && overlaps(rect, protectedRects())) continue;
+
+                if (strict) {
+                    var collision = false;
+                    for (var i = 0; i < used.length; i++) {
+                        var b = used[i];
+                        if (rect.left < b.r && rect.right > b.l && rect.top < b.b && rect.bottom > b.t) {
+                            collision = true;
+                            break;
+                        }
                     }
+                    if (collision) continue;
+                    used.push({ l: rect.left - 40, r: rect.right + 40, t: rect.top - 40, b: rect.bottom + 40 });
                 }
-                if (collision) continue;
-
-                used.push({ l: rect.left - 40, r: rect.right + 40, t: rect.top - 40, b: rect.bottom + 40 });
 
                 var bub = document.createElement("div");
                 bub.className = "bubble";
@@ -657,7 +660,7 @@
         initGift();
         var inits = [startBubbles, startFlowers, startCountdown, initLightbox, initMusic];
         for (var i = 0; i < inits.length; i++) {
-            try { inits[i](); } catch (e) { }
+            try { inits[i](); } catch (e) { console.log("INIT-FAIL: " + inits[i].name + " -> " + e.message); }
         }
     }
 

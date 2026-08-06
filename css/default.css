@@ -336,6 +336,7 @@ body {
 	text-align: center;
 	gap: 28px;
 	transition: opacity 0.9s ease, visibility 0.9s ease;
+	touch-action: manipulation;
 }
 
 #giftScreen.reveal {
@@ -373,6 +374,9 @@ body {
 	width: 240px;
 	height: 210px;
 	cursor: pointer;
+	pointer-events: auto;
+	z-index: 55;
+	touch-action: manipulation;
 	animation: giftBob 2.4s ease-in-out infinite;
 	transition: transform 0.3s ease;
 }

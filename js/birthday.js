@@ -635,17 +635,16 @@
             startContent();
         }
 
-        box.addEventListener("click", function (e) {
-            e.stopPropagation();
-            openGift();
-        });
+        box.addEventListener("click", openGift);
         screen.addEventListener("click", openGift);
+        box.addEventListener("pointerdown", openGift);
+        screen.addEventListener("pointerdown", openGift);
     }
 
     function startContent() {
         var codeEl = document.getElementById("code");
         if (codeEl) typewriter(codeEl, 45);
-        startHeart();
+        try { startHeart(); } catch (e) { }
     }
 
     /* ---------- boot ---------- */
@@ -655,12 +654,11 @@
 
     function boot() {
         if (isSmallScreen()) document.body.classList.add("mobile-zoom");
-        startBubbles();
-        startFlowers();
-        startCountdown();
-        initLightbox();
-        initMusic();
         initGift();
+        var inits = [startBubbles, startFlowers, startCountdown, initLightbox, initMusic];
+        for (var i = 0; i < inits.length; i++) {
+            try { inits[i](); } catch (e) { }
+        }
     }
 
     if (document.readyState === "loading") {

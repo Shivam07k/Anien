@@ -255,7 +255,7 @@
             var attempts = 0;
             while (movers.length < wanted && attempts < 500) {
                 attempts++;
-                var size = isMobile ? 42 + Math.random() * 22 : 56 + Math.random() * 34;
+                var size = isMobile ? 48 + Math.random() * 24 : 70 + Math.random() * 40;
                 var x = 16 + Math.random() * (vw - size - 32);
                 var y = 16 + Math.random() * (dh - size - 32);
                 var rect = { left: x, top: y, right: x + size, bottom: y + size };
@@ -407,7 +407,7 @@
             var count = isMobile ? 5 : 8;
             for (var i = 0; i < count; i++) {
                 var p = palettes[i % palettes.length];
-                var size = isMobile ? 40 + Math.random() * 26 : 54 + Math.random() * 36;
+                var size = isMobile ? 44 + Math.random() * 28 : 60 + Math.random() * 42;
                 var x;
                 var leftSide = Math.random() < 0.5;
                 x = leftSide ? -20 + Math.random() * (vw * 0.3) : vw * 0.72 + Math.random() * (vw * 0.3);
@@ -458,13 +458,13 @@
     }
 
     /* ---------- music ---------- */
+    var startMusicFn = null;
+
     function initMusic() {
         var audio = document.getElementById("bgMusic");
         var btn = document.getElementById("musicBtn");
         var hint = document.getElementById("musicHint");
         if (!audio || !btn) return;
-
-        var started = false;
 
         function isPlaying() {
             return !audio.paused && !audio.ended;
@@ -487,60 +487,176 @@
         btn.addEventListener("click", function () {
             if (isPlaying()) {
                 audio.pause();
+                if (hint) hint.classList.add("show");
             } else {
                 audio.play();
             }
             updateBtn();
         });
 
-        audio.addEventListener("play", function () {
-            started = true;
-            updateBtn();
-        });
+        audio.addEventListener("play", updateBtn);
         audio.addEventListener("pause", function () {
             updateBtn();
             if (hint) hint.classList.add("show");
         });
 
-        function tryPlay() {
+        startMusicFn = function () {
             var p = audio.play();
             if (p && p.then) {
-                p.then(function () {
-                    started = true;
-                    updateBtn();
-                }).catch(function () {
+                p.then(updateBtn).catch(function () {
                     btn.classList.add("pulse");
                     if (hint) hint.classList.add("show");
                 });
             }
+        };
+    }
+
+    /* ---------- gift opening screen ---------- */
+    function addFloatingHearts(screen) {
+        var hearts = ["\uD83C\uDF88", "\u2764\uFE0F", "\uD83D\uDC9E", "\u2728", "\uD83C\uDF8A", "\uD83D\uDC99"];
+        for (var i = 0; i < 10; i++) {
+            var s = document.createElement("div");
+            s.className = "float-heart";
+            s.textContent = hearts[i % hearts.length];
+            s.style.left = (6 + Math.random() * 88) + "%";
+            s.style.top = (10 + Math.random() * 80) + "%";
+            s.style.fontSize = (24 + Math.random() * 28) + "px";
+            s.style.animationDuration = (4 + Math.random() * 4) + "s";
+            s.style.animationDelay = (-Math.random() * 5) + "s";
+            screen.appendChild(s);
+        }
+    }
+
+    function startBurst(canvas, cx, cy) {
+        if (!canvas) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var ctx = canvas.getContext("2d");
+        var COLORS = ["#ffd166", "#ff5d8f", "#ff8fa3", "#ffb703", "#e63946", "#8338ec", "#06d6a0", "#4cc9f0", "#ffffff"];
+        var EMOJIS = ["\u2764\uFE0F", "\uD83C\uDF89", "\uD83C\uDF82", "\uD83C\uDF88", "\u2728", "\uD83C\uDF8A", "\uD83D\uDC8E"];
+        var parts = [];
+        var count = window.innerWidth <= 760 ? 90 : 130;
+        for (var i = 0; i < count; i++) {
+            var angle = Math.random() * Math.PI * 2;
+            var speed = 3 + Math.random() * 10;
+            parts.push({
+                x: cx,
+                y: cy,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 2.5,
+                life: 0,
+                maxLife: 45 + Math.random() * 45,
+                size: 3 + Math.random() * 6,
+                color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                emoji: i % 4 === 0 ? EMOJIS[Math.floor(Math.random() * EMOJIS.length)] : null,
+                rot: Math.random() * Math.PI * 2,
+                vr: (Math.random() - 0.5) * 0.3
+            });
+        }
+        for (var r = 0; r < 3; r++) {
+            parts.push({ x: cx, y: cy, vx: 0, vy: 0, life: 0, maxLife: 30, size: 8 + r * 22, color: "#fff", emoji: null, rot: 0, vr: 0, ring: true });
         }
 
-        tryPlay();
+        canvas.style.display = "block";
 
-        function startOnGesture() {
-            if (started || isPlaying()) return;
-            tryPlay();
+        function frame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var alive = false;
+            for (var i = 0; i < parts.length; i++) {
+                var p = parts[i];
+                p.life++;
+                if (p.life > p.maxLife) continue;
+                alive = true;
+                p.vy += 0.12;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.99;
+                var alpha = 1 - p.life / p.maxLife;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                if (p.ring) {
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, p.size + p.life * 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (p.emoji) {
+                    ctx.font = (p.size * 2.6) + "px serif";
+                    ctx.textAlign = "center";
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot + p.life * 0.04);
+                    ctx.fillText(p.emoji, 0, 0);
+                } else {
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.6);
+                }
+                ctx.restore();
+            }
+            if (alive) {
+                requestAnimationFrame(frame);
+            } else {
+                canvas.style.display = "none";
+            }
         }
-        var gestureEvents = ["pointerdown", "touchstart", "click", "keydown"];
-        for (var i = 0; i < gestureEvents.length; i++) {
-            document.addEventListener(gestureEvents[i], startOnGesture, { once: true });
+        requestAnimationFrame(frame);
+    }
+
+    function initGift() {
+        var screen = document.getElementById("giftScreen");
+        var box = document.getElementById("giftBox");
+        var burst = document.getElementById("burstCanvas");
+        var mainDiv = document.getElementById("mainDiv");
+        if (!screen || !box) return;
+
+        addFloatingHearts(screen);
+
+        var opened = false;
+        function openGift() {
+            if (opened) return;
+            opened = true;
+
+            var r = box.getBoundingClientRect();
+            var cx = r.left + r.width / 2;
+            var cy = r.top + r.height / 2;
+
+            box.classList.add("opened");
+            startBurst(burst, cx, cy);
+            if (startMusicFn) startMusicFn();
+
+            setTimeout(function () {
+                screen.classList.add("reveal");
+                if (mainDiv) mainDiv.classList.add("show");
+                setTimeout(function () {
+                    screen.style.display = "none";
+                }, 900);
+            }, 550);
+
+            startContent();
         }
+
+        box.addEventListener("click", function (e) {
+            e.stopPropagation();
+            openGift();
+        });
+        screen.addEventListener("click", openGift);
+    }
+
+    function startContent() {
+        var codeEl = document.getElementById("code");
+        if (codeEl) typewriter(codeEl, 45);
+        startHeart();
     }
 
     /* ---------- boot ---------- */
     function boot() {
-        var codeEl = document.getElementById("code");
-        if (codeEl) {
-            setTimeout(function () {
-                typewriter(codeEl, 50);
-                startHeart();
-            }, 400);
-        }
         startBubbles();
         startFlowers();
         startCountdown();
         initLightbox();
         initMusic();
+        initGift();
     }
 
     if (document.readyState === "loading") {

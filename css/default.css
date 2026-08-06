@@ -85,47 +85,76 @@ body {
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
+	opacity: 0;
+	transition: opacity 1.2s ease;
 }
+
+#mainDiv.show { opacity: 1; }
 
 #content {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 24px;
+	gap: 26px;
 	width: 100%;
-	max-width: 640px;
+	max-width: 720px;
 	margin: 0 auto;
-	padding: 26px 16px;
+	padding: 30px 18px;
 }
 
 #code {
-	width: min(560px, 94vw);
-	min-height: 360px;
-	padding: 24px 26px;
-	background: #282a36;
-	border-radius: 14px;
-	box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
-	color: #f8f8f2;
-	font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", sans-serif;
-	font-size: 13px;
-	line-height: 1.7;
+	width: min(640px, 96vw);
+	min-height: 400px;
+	padding: 36px 34px 40px;
+	background: #fffdf5;
+	background-image: radial-gradient(rgba(255, 77, 109, 0.07) 1.5px, transparent 1.5px);
+	background-size: 16px 16px;
+	border: 1px solid #ecd9c0;
+	border-radius: 10px;
+	box-shadow: 0 14px 40px rgba(120, 80, 40, 0.2), inset 0 1px 0 #fff;
+	color: #6b4a32;
+	font-family: "Segoe Script", "Caveat", "Brush Script MT", "Comic Sans MS", cursive;
+	font-size: 20px;
+	line-height: 1.9;
 	white-space: normal;
 	word-wrap: break-word;
 	position: relative;
 }
 
-#code .string { color: #f1fa8c; }
-#code .keyword { color: #ff79c6; font-weight: bold; }
-#code .placeholder { margin-left: 15px; }
-#code .space { margin-left: 14px; }
-#code .comments { color: #9bf6b6; font-style: italic; }
-#code .sign { color: #ffb86c; font-style: italic; margin-top: 14px; }
+#code::after {
+	content: "\2764";
+	position: absolute;
+	bottom: -18px;
+	right: 30px;
+	width: 48px;
+	height: 48px;
+	background: radial-gradient(circle at 30% 30%, #ff7ba1, #e63946);
+	border-radius: 50%;
+	color: #fff;
+	font-size: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 5px 12px rgba(230, 57, 70, 0.45);
+	border: 3px dashed rgba(255, 255, 255, 0.8);
+}
+
+#code .lhead {
+	color: #e63946;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#code .sign {
+	color: #b3546e;
+	font-style: italic;
+}
 
 #birthdayHeart {
 	position: relative;
-	width: min(560px, 94vw);
-	aspect-ratio: 560 / 540;
+	width: min(640px, 96vw);
+	aspect-ratio: 640 / 620;
 	flex-shrink: 0;
 	border-radius: 18px;
 	background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.6), rgba(255, 214, 228, 0.25) 60%, transparent 78%);
@@ -159,7 +188,7 @@ body {
 }
 
 #words .big {
-	font-size: clamp(20px, 5.2vw, 40px);
+	font-size: clamp(24px, 6vw, 48px);
 	font-weight: 800;
 	letter-spacing: 2px;
 	text-shadow: 0 4px 14px rgba(255, 255, 255, 0.9);
@@ -168,7 +197,7 @@ body {
 }
 
 #words .age {
-	font-size: clamp(12px, 2.8vw, 19px);
+	font-size: clamp(14px, 3vw, 22px);
 	font-weight: 600;
 	color: #b3546e;
 	margin-bottom: 4px;
@@ -176,7 +205,7 @@ body {
 }
 
 #words .countdown {
-	font-size: clamp(10px, 2.2vw, 14px);
+	font-size: clamp(11px, 2.4vw, 16px);
 	font-weight: 600;
 	color: #8d4b5e;
 	margin-top: 4px;
@@ -185,14 +214,14 @@ body {
 
 #words .digit {
 	font-family: "Consolas", "Courier New", monospace;
-	font-size: clamp(12px, 2.6vw, 18px);
+	font-size: clamp(13px, 2.9vw, 20px);
 	font-weight: 700;
 	color: #e63946;
 }
 
 #words .by {
 	margin-top: 12px;
-	font-size: clamp(11px, 2.3vw, 15px);
+	font-size: clamp(13px, 2.5vw, 17px);
 	font-style: italic;
 	color: #6d3f4d;
 }
@@ -291,19 +320,204 @@ body {
 	to   { transform: rotate(360deg); }
 }
 
+/* ---------- gift opening screen ---------- */
+#giftScreen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(160deg, #ffe3ec, #ffd1dc 55%, #ffc0d0);
+	z-index: 50;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 28px;
+	transition: opacity 0.9s ease, visibility 0.9s ease;
+}
+
+#giftScreen.reveal {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.gift-title {
+	font-family: "Segoe Script", "Caveat", "Brush Script MT", cursive;
+	font-size: 38px;
+	font-weight: bold;
+	color: #e63946;
+	text-shadow: 0 3px 12px rgba(255, 255, 255, 0.9);
+}
+
+.gift-sub {
+	font-family: "Segoe Script", "Caveat", "Brush Script MT", cursive;
+	font-size: 24px;
+	color: #b3546e;
+}
+
+.gift-tap {
+	font-size: 18px;
+	color: #6d3f4d;
+	background: rgba(255, 255, 255, 0.75);
+	padding: 9px 20px;
+	border-radius: 22px;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+	animation: pulse 1.6s ease-in-out infinite;
+}
+
+#giftBox {
+	position: relative;
+	width: 240px;
+	height: 210px;
+	cursor: pointer;
+	animation: giftBob 2.4s ease-in-out infinite;
+	transition: transform 0.3s ease;
+}
+
+#giftBox:hover { transform: scale(1.06); }
+
+#giftBox.opened { animation: giftShake 0.55s ease-in-out; }
+
+.gift-body {
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	top: 74px;
+	bottom: 6px;
+	background: linear-gradient(180deg, #ff6b95, #e6397b);
+	border-radius: 8px;
+	box-shadow: 0 8px 20px rgba(230, 57, 123, 0.35);
+}
+
+.gift-lid {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 42px;
+	height: 42px;
+	background: linear-gradient(180deg, #ff8fa8, #ff5d8f);
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(230, 57, 123, 0.3);
+	z-index: 2;
+	transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+#giftBox.opened .gift-lid {
+	transform: translate(-20px, -96px) rotate(-24deg);
+	opacity: 0;
+}
+
+.gift-ribbon-h {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 88px;
+	height: 24px;
+	background: #ffd166;
+	z-index: 3;
+}
+
+.gift-ribbon-v {
+	position: absolute;
+	left: 50%;
+	top: 42px;
+	bottom: 6px;
+	width: 42px;
+	margin-left: -21px;
+	background: #ffd166;
+	z-index: 4;
+}
+
+.gift-bow {
+	position: absolute;
+	left: 50%;
+	top: 18px;
+	width: 64px;
+	height: 30px;
+	margin-left: -32px;
+	z-index: 5;
+}
+
+.gift-bow::before,
+.gift-bow::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	width: 32px;
+	height: 28px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #ffd166, #ffb703);
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.gift-bow::before { left: 0; transform: rotate(-16deg); }
+.gift-bow::after { right: 0; transform: rotate(16deg); }
+
+.gift-knot {
+	position: absolute;
+	left: 50%;
+	top: 8px;
+	width: 18px;
+	height: 16px;
+	margin-left: -9px;
+	border-radius: 50%;
+	background: #ffb703;
+	z-index: 6;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes giftBob {
+	0%, 100% { transform: translateY(0); }
+	50%      { transform: translateY(-12px); }
+}
+
+@keyframes giftShake {
+	0%, 100% { transform: translateY(0) rotate(0deg); }
+	20%      { transform: translateY(-10px) rotate(-9deg); }
+	40%      { transform: rotate(9deg); }
+	60%      { transform: rotate(-7deg); }
+	80%      { transform: rotate(5deg); }
+}
+
+.float-heart {
+	position: absolute;
+	opacity: 0.5;
+	animation: floatHeart 6s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes floatHeart {
+	0%, 100% { transform: translateY(0) rotate(-10deg); opacity: 0.3; }
+	50%      { transform: translateY(-26px) rotate(12deg); opacity: 0.95; }
+}
+
+#burstCanvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 60;
+	display: none;
+}
+
 @media (max-width: 1024px) {
-	#content { gap: 20px; padding: 20px 14px; }
-	#code { font-size: 12px; }
+	#content { gap: 22px; padding: 22px 14px; }
+	.gift-title { font-size: 32px; }
 }
 
 @media (max-width: 760px) {
 	#mainDiv { align-items: flex-start; }
-	#content { flex-direction: column; gap: 16px; padding: 16px 12px 70px; }
+	#content { flex-direction: column; gap: 18px; padding: 18px 12px 70px; }
 	#code {
 		width: 100%;
 		min-height: 0;
-		padding: 16px 14px;
-		font-size: 11px;
+		padding: 22px 18px 34px;
+		font-size: 17px;
 	}
 	#birthdayHeart {
 		width: 100%;

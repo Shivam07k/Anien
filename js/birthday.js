@@ -461,6 +461,7 @@
     function initMusic() {
         var audio = document.getElementById("bgMusic");
         var btn = document.getElementById("musicBtn");
+        var hint = document.getElementById("musicHint");
         if (!audio || !btn) return;
 
         var started = false;
@@ -480,6 +481,7 @@
                 btn.innerHTML = "&#127911;";
                 btn.title = "Play song";
             }
+            if (hint) hint.classList.remove("show");
         }
 
         btn.addEventListener("click", function () {
@@ -495,7 +497,10 @@
             started = true;
             updateBtn();
         });
-        audio.addEventListener("pause", updateBtn);
+        audio.addEventListener("pause", function () {
+            updateBtn();
+            if (hint) hint.classList.add("show");
+        });
 
         function tryPlay() {
             var p = audio.play();
@@ -505,6 +510,7 @@
                     updateBtn();
                 }).catch(function () {
                     btn.classList.add("pulse");
+                    if (hint) hint.classList.add("show");
                 });
             }
         }
@@ -515,8 +521,10 @@
             if (started || isPlaying()) return;
             tryPlay();
         }
-        document.addEventListener("pointerdown", startOnGesture, { once: true });
-        document.addEventListener("touchstart", startOnGesture, { once: true });
+        var gestureEvents = ["pointerdown", "touchstart", "click", "keydown"];
+        for (var i = 0; i < gestureEvents.length; i++) {
+            document.addEventListener(gestureEvents[i], startOnGesture, { once: true });
+        }
     }
 
     /* ---------- boot ---------- */

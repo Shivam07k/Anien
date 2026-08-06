@@ -191,6 +191,7 @@
         if (!layer) return;
 
         var movers = [];
+        var used = [];
         var codeRect = null;
 
         function docHeight() {
@@ -616,6 +617,7 @@
 
         var opened = false;
         function openGift() {
+            if (startMusicFn) startMusicFn();
             if (opened) return;
             opened = true;
 
@@ -625,7 +627,6 @@
 
             box.classList.add("opened");
             startBurst(burst, cx, cy);
-            if (startMusicFn) startMusicFn();
 
             setTimeout(function () {
                 screen.classList.add("reveal");

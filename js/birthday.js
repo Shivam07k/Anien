@@ -249,13 +249,12 @@
         function spawn() {
             var vw = window.innerWidth;
             var dh = docHeight();
-            var isMobile = vw <= 760;
+            var isMobile = isSmallScreen();
             var wanted = isMobile ? 10 : 14;
-            var used = [];
             var attempts = 0;
             while (movers.length < wanted && attempts < 500) {
                 attempts++;
-                var size = isMobile ? 48 + Math.random() * 24 : 70 + Math.random() * 40;
+                var size = isMobile ? 68 + Math.random() * 26 : 70 + Math.random() * 40;
                 var x = 16 + Math.random() * (vw - size - 32);
                 var y = 16 + Math.random() * (dh - size - 32);
                 var rect = { left: x, top: y, right: x + size, bottom: y + size };
@@ -403,11 +402,11 @@
         function spawn() {
             var vw = window.innerWidth;
             var dh = docHeight();
-            var isMobile = vw <= 760;
+            var isMobile = isSmallScreen();
             var count = isMobile ? 5 : 8;
             for (var i = 0; i < count; i++) {
                 var p = palettes[i % palettes.length];
-                var size = isMobile ? 44 + Math.random() * 28 : 60 + Math.random() * 42;
+                var size = isMobile ? 64 + Math.random() * 30 : 60 + Math.random() * 42;
                 var x;
                 var leftSide = Math.random() < 0.5;
                 x = leftSide ? -20 + Math.random() * (vw * 0.3) : vw * 0.72 + Math.random() * (vw * 0.3);
@@ -650,7 +649,12 @@
     }
 
     /* ---------- boot ---------- */
+    function isSmallScreen() {
+        return window.screen && window.screen.width > 0 && window.screen.width <= 600;
+    }
+
     function boot() {
+        if (isSmallScreen()) document.body.classList.add("mobile-zoom");
         startBubbles();
         startFlowers();
         startCountdown();

@@ -505,6 +505,25 @@ body {
 	display: none;
 }
 
+/* ---------- extra zoom on real mobile screens ---------- */
+body.mobile-zoom #content { max-width: 800px; }
+body.mobile-zoom #code {
+	width: min(660px, 96vw);
+	font-size: 22px;
+	padding: 40px 38px 46px;
+}
+body.mobile-zoom #code .lhead { font-size: 27px; }
+body.mobile-zoom #birthdayHeart { width: min(660px, 96vw); }
+body.mobile-zoom #words .big { font-size: clamp(28px, 7vw, 54px); }
+body.mobile-zoom #words .age { font-size: clamp(16px, 3.4vw, 24px); }
+body.mobile-zoom #words .countdown { font-size: clamp(13px, 2.7vw, 18px); }
+body.mobile-zoom #words .digit { font-size: clamp(15px, 3.3vw, 22px); }
+body.mobile-zoom #words .by { font-size: clamp(14px, 2.8vw, 19px); }
+body.mobile-zoom .gift-title { font-size: 42px; }
+body.mobile-zoom .gift-sub { font-size: 27px; }
+body.mobile-zoom .gift-tap { font-size: 21px; }
+body.mobile-zoom #giftBox { width: 260px; height: 230px; }
+
 @media (max-width: 1024px) {
 	#content { gap: 22px; padding: 22px 14px; }
 	.gift-title { font-size: 32px; }
